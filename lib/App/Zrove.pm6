@@ -4,10 +4,6 @@ unit class App::Zrove:ver<0.0.1>;
 use Zef;
 use Zef::CLI;
 
-my &get-client = &Zef::CLI::get-client;
-my &abort = &Zef::CLI::abort;
-my &path2candidate = &Zef::CLI::path2candidate;
-
 sub test(
     $CONFIG,
     $verbosity,
@@ -15,22 +11,23 @@ sub test(
     Int  :timeout(:$test-timeout),
     *@paths ($, *@)
 ) {
-    my $client = get-client(:config($CONFIG), :$force-test, :$test-timeout);
-    my @candidates = $client.link-candidates( @paths.map(*.&path2candidate) );
-    abort "Failed to resolve any candidates. No reason to proceed" unless +@candidates;
-    my @tested = $client.test(@candidates);
-    my (:@test-pass, :@test-fail) := @tested.classify: {.test-results.grep(*.so) ?? <test-pass> !! <test-fail> }
+    my $client = ZEF::CLI::get-client(:config($CONFIG), :$force-test, :$test-timeout);
+#    my @candidates = $client.link-candidates( @paths.map(*.&ZEF::CLI::path2candidate) );
+#    die "Failed to resolve any candidates. No reason to proceed" unless +@candidates;
+#    my @tested = $client.test(@candidates);
+#    my (:@test-pass, :@test-fail) := @tested.classify: {.test-results.grep(*.so) ?? <test-pass> !! <test-fail> }
     
-    say "!!!> Testing failed: {.as}{?($verbosity >= VERBOSE)??' at '~.dist.path!!''}" for @test-fail;
+#    say "!!!> Testing failed: {.as}{?($verbosity >= VERBOSE)??' at '~.dist.path!!''}" for @test-fail;
     
-    exit ?@test-fail ?? 1 !! ?@test-pass ?? 0 !! 255;
+    #    return ?@test-fail ?? 1 !! ?@test-pass ?? 0 !! 255;
+    return $client;
 }
 
 =begin pod
 
 =head1 NAME
 
-App::Zrove - blah blah blah
+App::Zrove - Equivalent to prove, using Zef machinery.
 
 =head1 SYNOPSIS
 
